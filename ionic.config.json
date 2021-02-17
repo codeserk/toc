@@ -1,0 +1,7 @@
+{
+  "name": "toc",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue"
+}
