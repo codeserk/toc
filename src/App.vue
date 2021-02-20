@@ -1,18 +1,27 @@
 <template>
-  <ion-app>
+  <ion-app v-show="isReady">
     <ion-router-outlet />
   </ion-app>
 </template>
 
 <script lang="ts">
-import { IonApp, IonRouterOutlet } from '@ionic/vue'
-import { defineComponent } from 'vue'
+import { defineComponent, onMounted, ref } from 'vue'
+import { loadSections } from './modules/sections/section.store'
 
 export default defineComponent({
-  name: 'App',
-  components: {
-    IonApp,
-    IonRouterOutlet,
+  setup() {
+    const state = {
+      isReady: ref<boolean>(false),
+    }
+
+    onMounted(async () => {
+      await loadSections()
+      state.isReady.value = true
+    })
+
+    return {
+      ...state,
+    }
   },
 })
 </script>
