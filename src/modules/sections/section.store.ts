@@ -66,7 +66,6 @@ export async function loadSections() {
 
       for (const id in sections) {
         mutations.setSection(sections[id])
-        console.log('loaded', sections[id])
       }
     }
   } catch (error) {

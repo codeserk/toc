@@ -11,7 +11,13 @@
         <ion-label v-text="check.name" v-if="!isEditing" />
         <ion-input v-model="check.name" v-if="isEditing" />
 
-        <ion-toggle slot="end" v-if="!isEditing" />
+        <ion-checkbox
+          slot="end"
+          v-if="!isEditing"
+          :checked="isCheckCompleted(check.id)"
+          @ion-change="onToggleChanged(check.id, $event.target.checked)"
+        />
+
         <ion-button slot="end" v-if="isEditing" fill="clear" @click="removeCheck(check.id)">
           <ion-icon slot="icon-only" name="trash-outline" size="small" color="danger" />
         </ion-button>
@@ -39,6 +45,7 @@ import {
 
 import SectionsViewHeader from '@/components/SectionsView/SectionsViewHeader.vue'
 import { deepCopy } from '../utils/object'
+import { isCheckCompleted, setCheckCompleted } from '../modules/checks/check.store'
 
 export default defineComponent({
   components: {
@@ -69,6 +76,8 @@ export default defineComponent({
     }
 
     const methods = {
+      isCheckCompleted,
+
       onReordered(detail: any) {
         const { from, to } = detail
         const checks = getters.sortedChecks.value
@@ -85,6 +94,10 @@ export default defineComponent({
         }
 
         detail.complete(true)
+      },
+
+      async onToggleChanged(checkId: string, isCompleted: boolean) {
+        await setCheckCompleted(checkId, isCompleted)
       },
 
       async addCheck() {
@@ -120,6 +133,8 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .section {
+  overflow-y: scroll;
   width: 100%;
+  height: 100%;
 }
 </style>

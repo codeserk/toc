@@ -17,3 +17,7 @@ export interface CheckLogItem {
   date: Date
   event: CheckEvent
 }
+
+export interface CheckState {
+  completed: boolean
+}
