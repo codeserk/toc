@@ -1,6 +1,6 @@
 import { Storage } from '@capacitor/core'
 import { reactive } from 'vue'
-import { period } from '../time/time.store'
+import { periodKey } from '../time/time.store'
 import { CheckState } from './check.interface'
 
 const state = {
@@ -8,16 +8,16 @@ const state = {
 }
 
 // Getters
-export function getState(checkId: string, period: string): CheckState | undefined {
+export function getState(checkId: string, periodKey: string): CheckState | undefined {
   if (!state.states[checkId]) {
     return
   }
 
-  return state.states[checkId][period]
+  return state.states[checkId][periodKey]
 }
 
 export function getCurrentState(checkId: string): CheckState | undefined {
-  return getState(checkId, period.value)
+  return getState(checkId, periodKey.value)
 }
 
 export function isCheckCompleted(checkId: string): boolean {
@@ -28,12 +28,12 @@ export function isCheckCompleted(checkId: string): boolean {
 
 // Mutations
 const mutations = {
-  setState(checkId: string, period: string, newState: CheckState) {
+  setState(checkId: string, periodKey: string, newState: CheckState) {
     if (!state.states[checkId]) {
       state.states[checkId] = {}
     }
 
-    state.states[checkId][period] = newState
+    state.states[checkId][periodKey] = newState
   },
 }
 
@@ -45,21 +45,18 @@ export async function loadStates() {
       const states = JSON.parse(data?.value)
 
       for (const id in states) {
-        for (const period in states[id]) {
-          mutations.setState(id, period, states[id][period])
+        for (const periodKey in states[id]) {
+          mutations.setState(id, periodKey, states[id][periodKey])
         }
       }
     }
-
-    console.log('states', state.states)
   } catch (error) {
     console.error(error)
   }
 }
 
 export async function setCheckCompleted(checkId: string, isCompleted: boolean) {
-  console.log(checkId)
-  mutations.setState(checkId, period.value, { completed: isCompleted })
+  mutations.setState(checkId, periodKey.value, { completed: isCompleted })
 
   await persist()
 }

@@ -8,6 +8,7 @@
 import { defineComponent, onMounted, ref } from 'vue'
 import { loadStates } from './modules/checks/check.store'
 import { loadSections } from './modules/sections/section.store'
+import { loadPeriods } from './modules/time/time.store'
 
 export default defineComponent({
   setup() {
@@ -18,6 +19,7 @@ export default defineComponent({
     onMounted(async () => {
       await loadSections()
       await loadStates()
+      loadPeriods()
 
       state.isReady.value = true
     })

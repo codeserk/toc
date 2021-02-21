@@ -14,7 +14,7 @@ export const isEditing = computed((): boolean => state.isEditing.value)
 
 export const sections = computed(() => Object.values(state.sections))
 export const sectionsSorted = computed((): SavedSection[] =>
-  sections.value.sort((sectionA, sectionB) => sectionB.position - sectionA.position),
+  sections.value.sort((sectionA, sectionB) => sectionA.position - sectionB.position),
 )
 
 export const nextSectionPosition = computed(() => {

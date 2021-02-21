@@ -41,6 +41,7 @@ app.mixin({
 // Ionic components
 import {
   IonApp,
+  IonActionSheet,
   IonAvatar,
   IonBackButton,
   IonButton,
@@ -91,9 +92,12 @@ import {
   IonToolbar,
   IonSelect,
   IonSelectOption,
+  IonBadge,
+  IonFooter,
 } from '@ionic/vue'
 app
   .component('IonApp', IonApp)
+  .component('IonActionSheet', IonActionSheet)
   .component('IonAvatar', IonAvatar)
   .component('IonBackButton', IonBackButton)
   .component('IonButton', IonButton)
@@ -101,6 +105,8 @@ app
   .component('IonCheckbox', IonCheckbox)
   .component('IonCol', IonCol)
   .component('IonContent', IonContent)
+  .component('IonBadge', IonBadge)
+  .component('IonFooter', IonFooter)
   .component('IonGrid', IonGrid)
   .component('IonHeader', IonHeader)
   .component('IonIcon', IonIcon)
@@ -181,9 +187,15 @@ import {
   refreshOutline,
   reorderThreeOutline,
   addOutline,
+  closeOutline,
+  checkmarkCircle,
+  cog,
 } from 'ionicons/icons'
 
 addIcons({
+  'checkmark-circle': checkmarkCircle,
+  cog: cog,
+  'close-outline': closeOutline,
   'add-outline': addOutline,
   'reorder-three-outline': reorderThreeOutline,
   'refresh-outline': refreshOutline,

@@ -1,21 +1,27 @@
 <template>
-  <sections-view-header :section-id="sectionId" @cancel-edit="cancelEdit" @save="save" />
+  <sections-view-header
+    :section-id="sectionId"
+    @name-changed="name => (section.name = name)"
+    @cancel-edit="cancelEdit"
+    @save="save"
+  />
 
   <ion-content class="section">
     <ion-reorder-group :disabled="false" @ion-item-reorder="({ detail }) => onReordered(detail)">
-      <ion-item v-for="check in sortedChecks" :key="check.id">
+      <ion-item v-for="check in sortedChecksForPeriod" :key="check.id">
         <ion-reorder slot="start" v-if="isEditing">
           <ion-icon name="reorder-three-outline"></ion-icon>
         </ion-reorder>
 
-        <ion-label v-text="check.name" v-if="!isEditing" />
+        <ion-label v-text="check.name" v-if="!isEditing" @click="onToggleChanged(check.id, !check.isCompleted)" />
         <ion-input v-model="check.name" v-if="isEditing" />
 
-        <ion-checkbox
+        <input
           slot="end"
+          type="checkbox"
           v-if="!isEditing"
-          :checked="isCheckCompleted(check.id)"
-          @ion-change="onToggleChanged(check.id, $event.target.checked)"
+          :checked="check.isCompleted"
+          @change="onToggleChanged(check.id, $event.target.checked)"
         />
 
         <ion-button slot="end" v-if="isEditing" fill="clear" @click="removeCheck(check.id)">
@@ -26,7 +32,9 @@
 
     <ion-item v-if="!isEditing">
       <ion-input v-model="newCheckName" placeholder="Nuevo recordatorio..." @keyup.enter="addCheck" />
-      <ion-button v-text="'Add'" :disabled="!isCheckNameValid" @click="addCheck" />
+      <ion-button :disabled="!isCheckNameValid" @click="addCheck" shape="round" fill="block">
+        <ion-icon name="add-outline" slot="icon-only" />
+      </ion-button>
     </ion-item>
   </ion-content>
 </template>
@@ -46,6 +54,7 @@ import {
 import SectionsViewHeader from '@/components/SectionsView/SectionsViewHeader.vue'
 import { deepCopy } from '../utils/object'
 import { isCheckCompleted, setCheckCompleted } from '../modules/checks/check.store'
+import { periodKey } from '../modules/time/time.store'
 
 export default defineComponent({
   components: {
@@ -69,10 +78,18 @@ export default defineComponent({
     }
 
     const getters = {
+      periodKey,
       isEditing,
       isCheckNameValid: computed(() => !!state.newCheckName.value),
 
       sortedChecks: computed(() => getSectionSortedChecks(state.section.value)),
+
+      sortedChecksForPeriod: computed(() =>
+        getters.sortedChecks.value.map(check => ({
+          ...check,
+          isCompleted: isCheckCompleted(check.id),
+        })),
+      ),
     }
 
     const methods = {

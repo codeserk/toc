@@ -11,6 +11,30 @@
         </swiper-slide>
       </swiper>
     </ion-content>
+
+    <ion-footer class="sections-header">
+      <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-button @click="setPrevPeriod" :disabled="!hasPrevPeriod">
+            <ion-icon slot="icon-only" name="chevron-back" />
+          </ion-button>
+          <ion-button @click="setNextPeriod" :disabled="!hasNextPeriod">
+            <ion-icon slot="icon-only" name="chevron-forward" />
+          </ion-button>
+        </ion-buttons>
+
+        <ion-title class="header-title">
+          <span v-text="period.localized" />
+          <ion-badge v-text="isCurrentPeriod ? 'Hoy' : ''" />
+        </ion-title>
+
+        <ion-buttons slot="end">
+          <ion-button>
+            <ion-icon name="cog" slot="icon-only" />
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-footer>
   </ion-page>
 </template>
 
@@ -21,6 +45,16 @@ import { isEditing, sectionsSorted } from '@/modules/sections/section.store'
 import 'swiper/swiper.scss'
 import { Swiper, SwiperSlide } from 'swiper/vue'
 import { computed, defineComponent, nextTick, onMounted, ref, watch } from 'vue'
+import {
+  availablePeriods,
+  hasNextPeriod,
+  hasPrevPeriod,
+  isCurrentPeriod,
+  period,
+  periodKey,
+  setNextPeriod,
+  setPrevPeriod,
+} from '../modules/time/time.store'
 
 export default defineComponent({
   components: {
@@ -39,6 +73,12 @@ export default defineComponent({
     const getters = {
       isEditing,
       sectionsSorted,
+      availablePeriods,
+      period,
+      isCurrentPeriod,
+
+      hasPrevPeriod: computed(() => hasPrevPeriod(periodKey.value)),
+      hasNextPeriod: computed(() => hasNextPeriod(periodKey.value)),
 
       sliderOptions: computed((): any => ({
         speed: 400,
@@ -47,9 +87,8 @@ export default defineComponent({
     }
 
     const methods = {
-      onSlideChanged() {
-        console.log('slide changed')
-      },
+      setPrevPeriod,
+      setNextPeriod,
     }
 
     onMounted(() => {
@@ -83,6 +122,26 @@ export default defineComponent({
     // align-items: flex-start;
     // width: 100%;
     height: 100%;
+  }
+}
+
+.sections-header {
+  overflow: unset;
+  &::after {
+    content: none;
+  }
+
+  .header-title {
+    position: relative;
+    margin-right: 20px;
+    text-align: center;
+
+    ion-badge {
+      position: absolute;
+      top: -5px;
+      padding: 0.5em 0.5em 0.25em 0.5em;
+      font-size: 10px;
+    }
   }
 }
 </style>
