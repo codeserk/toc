@@ -130,7 +130,7 @@ app
   .component('IonRange', IonRange)
   .component('IonReorder', IonReorder)
   .component('IonReorderGroup', IonReorderGroup)
-  .component('IonRippleEffect,', IonRippleEffect)
+  .component('IonRippleEffect', IonRippleEffect)
   .component('IonRouterOutlet', IonRouterOutlet)
   .component('IonRow', IonRow)
   .component('IonSearchbar', IonSearchbar)
@@ -158,6 +158,7 @@ router.isReady().then(() => {
 // Icons
 import { addIcons } from 'ionicons'
 import {
+  checkmarkOutline,
   saveOutline,
   createOutline,
   playCircleOutline,
@@ -195,6 +196,7 @@ import {
 } from 'ionicons/icons'
 
 addIcons({
+  'checkmark-outline': checkmarkOutline,
   'flash-outline': flashOutline,
   'flash-off-outline': flashOffOutline,
   'checkmark-circle': checkmarkCircle,

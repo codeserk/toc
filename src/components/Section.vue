@@ -8,32 +8,14 @@
     />
     <ion-content>
       <ion-reorder-group :disabled="false" @ion-item-reorder="({ detail }) => onReordered(detail)">
-        <ion-item
+        <check
           v-for="check in sortedChecksForPeriod"
           :key="check.id"
-          lines="none"
-          :class="{ 'check-completed': check.isCompleted }"
-        >
-          <ion-reorder slot="start" v-if="isEditing">
-            <ion-icon name="reorder-three-outline"></ion-icon>
-          </ion-reorder>
-
-          <ion-label v-text="check.name" v-if="!isEditing" @click="onToggleChanged(check.id, !check.isCompleted)" />
-          <ion-input v-model="check.name" v-if="isEditing" />
-
-          <input
-            v-if="!isEditing"
-            slot="end"
-            type="checkbox"
-            class="check-checkbox"
-            :checked="check.isCompleted"
-            @change="onToggleChanged(check.id, $event.target.checked)"
-          />
-
-          <ion-button slot="end" v-if="isEditing" fill="clear" @click="removeCheck(check.id)">
-            <ion-icon slot="icon-only" name="trash-outline" size="small" color="danger" />
-          </ion-button>
-        </ion-item>
+          :is-editing="isEditing"
+          :check="check"
+          @name-changed="newName => updateCheckName(check.id, newName)"
+          @remove="removeCheck(check.id)"
+        />
       </ion-reorder-group>
     </ion-content>
 
@@ -60,12 +42,14 @@ import {
 
 import SectionsViewHeader from '@/components/SectionsView/SectionsViewHeader.vue'
 import { deepCopy } from '../utils/object'
-import { isCheckCompleted, setCheckCompleted } from '../modules/checks/check.store'
+import { isCheckCompleted } from '../modules/checks/check.store'
 import { period, periodKey } from '../modules/time/time.store'
+import Check from './Check.vue'
 
 export default defineComponent({
   components: {
     SectionsViewHeader,
+    Check,
   },
 
   props: {
@@ -121,8 +105,12 @@ export default defineComponent({
         detail.complete(true)
       },
 
-      async onToggleChanged(checkId: string, isCompleted: boolean) {
-        await setCheckCompleted(checkId, isCompleted)
+      updateCheckName(checkId: string, name: string) {
+        if (!state.section.value?.checks[checkId]) {
+          return
+        }
+
+        state.section.value.checks[checkId].name = name
       },
 
       async addCheck() {
@@ -146,6 +134,7 @@ export default defineComponent({
       },
 
       async save() {
+        console.log(state.section.value)
         await updateSection(state.section.value)
         stopEditing()
       },
@@ -167,26 +156,6 @@ export default defineComponent({
     flex: 1;
     overflow-y: auto;
     transition: opacity 0.4s ease-in-out;
-
-    ion-item {
-      ion-label {
-        text-decoration: line-through;
-        opacity: 1;
-        transition: all 0.4s ease-in-out;
-        text-decoration-color: transparent;
-      }
-
-      .check-checkbox {
-        transition: opacity 0.4s ease-in-out;
-      }
-
-      &.check-completed {
-        ion-label {
-          opacity: 0.6;
-          text-decoration-color: black;
-        }
-      }
-    }
   }
   ion-header {
     flex: 0;
