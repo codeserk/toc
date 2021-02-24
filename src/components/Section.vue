@@ -1,34 +1,41 @@
 <template>
-  <sections-view-header
-    :section-id="sectionId"
-    @name-changed="name => (section.name = name)"
-    @cancel-edit="cancelEdit"
-    @save="save"
-  />
+  <div class="section" :class="{ 'period-disabled': period.isDisabled, 'section-editing': isEditing }">
+    <sections-view-header
+      :section-id="sectionId"
+      @name-changed="name => (section.name = name)"
+      @cancel-edit="cancelEdit"
+      @save="save"
+    />
+    <ion-content>
+      <ion-reorder-group :disabled="false" @ion-item-reorder="({ detail }) => onReordered(detail)">
+        <ion-item
+          v-for="check in sortedChecksForPeriod"
+          :key="check.id"
+          lines="none"
+          :class="{ 'check-completed': check.isCompleted }"
+        >
+          <ion-reorder slot="start" v-if="isEditing">
+            <ion-icon name="reorder-three-outline"></ion-icon>
+          </ion-reorder>
 
-  <ion-content class="section">
-    <ion-reorder-group :disabled="false" @ion-item-reorder="({ detail }) => onReordered(detail)">
-      <ion-item v-for="check in sortedChecksForPeriod" :key="check.id">
-        <ion-reorder slot="start" v-if="isEditing">
-          <ion-icon name="reorder-three-outline"></ion-icon>
-        </ion-reorder>
+          <ion-label v-text="check.name" v-if="!isEditing" @click="onToggleChanged(check.id, !check.isCompleted)" />
+          <ion-input v-model="check.name" v-if="isEditing" />
 
-        <ion-label v-text="check.name" v-if="!isEditing" @click="onToggleChanged(check.id, !check.isCompleted)" />
-        <ion-input v-model="check.name" v-if="isEditing" />
+          <input
+            v-if="!isEditing"
+            slot="end"
+            type="checkbox"
+            class="check-checkbox"
+            :checked="check.isCompleted"
+            @change="onToggleChanged(check.id, $event.target.checked)"
+          />
 
-        <input
-          slot="end"
-          type="checkbox"
-          v-if="!isEditing"
-          :checked="check.isCompleted"
-          @change="onToggleChanged(check.id, $event.target.checked)"
-        />
-
-        <ion-button slot="end" v-if="isEditing" fill="clear" @click="removeCheck(check.id)">
-          <ion-icon slot="icon-only" name="trash-outline" size="small" color="danger" />
-        </ion-button>
-      </ion-item>
-    </ion-reorder-group>
+          <ion-button slot="end" v-if="isEditing" fill="clear" @click="removeCheck(check.id)">
+            <ion-icon slot="icon-only" name="trash-outline" size="small" color="danger" />
+          </ion-button>
+        </ion-item>
+      </ion-reorder-group>
+    </ion-content>
 
     <ion-item v-if="!isEditing">
       <ion-input v-model="newCheckName" placeholder="Nuevo recordatorio..." @keyup.enter="addCheck" />
@@ -36,7 +43,7 @@
         <ion-icon name="add-outline" slot="icon-only" />
       </ion-button>
     </ion-item>
-  </ion-content>
+  </div>
 </template>
 
 <script lang="ts">
@@ -54,7 +61,7 @@ import {
 import SectionsViewHeader from '@/components/SectionsView/SectionsViewHeader.vue'
 import { deepCopy } from '../utils/object'
 import { isCheckCompleted, setCheckCompleted } from '../modules/checks/check.store'
-import { periodKey } from '../modules/time/time.store'
+import { period, periodKey } from '../modules/time/time.store'
 
 export default defineComponent({
   components: {
@@ -79,6 +86,7 @@ export default defineComponent({
 
     const getters = {
       periodKey,
+      period,
       isEditing,
       isCheckNameValid: computed(() => !!state.newCheckName.value),
 
@@ -150,8 +158,58 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .section {
-  overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100%;
+
+  ion-content {
+    flex: 1;
+    overflow-y: auto;
+    transition: opacity 0.4s ease-in-out;
+
+    ion-item {
+      ion-label {
+        text-decoration: line-through;
+        opacity: 1;
+        transition: all 0.4s ease-in-out;
+        text-decoration-color: transparent;
+      }
+
+      .check-checkbox {
+        transition: opacity 0.4s ease-in-out;
+      }
+
+      &.check-completed {
+        ion-label {
+          opacity: 0.6;
+          text-decoration-color: black;
+        }
+      }
+    }
+  }
+  ion-header {
+    flex: 0;
+  }
+
+  &.period-disabled {
+    ion-content {
+      opacity: 0.5;
+
+      ion-item {
+        pointer-events: none;
+
+        .check-checkbox {
+          opacity: 0;
+        }
+      }
+    }
+
+    &.section-editing {
+      ion-content {
+        opacity: 1;
+      }
+    }
+  }
 }
 </style>

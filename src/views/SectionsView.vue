@@ -12,7 +12,7 @@
       </swiper>
     </ion-content>
 
-    <ion-footer class="sections-header">
+    <ion-footer class="sections-header" :class="{ 'period-disabled': period.isDisabled }">
       <ion-toolbar>
         <ion-buttons slot="start">
           <ion-button @click="setPrevPeriod" :disabled="!hasPrevPeriod">
@@ -23,7 +23,7 @@
           </ion-button>
         </ion-buttons>
 
-        <ion-title class="header-title">
+        <ion-title class="header-title" @click="isShowingActions = true">
           <span v-text="period.localized" />
           <ion-badge v-text="isCurrentPeriod ? 'Hoy' : ''" />
         </ion-title>
@@ -35,6 +35,15 @@
         </ion-buttons>
       </ion-toolbar>
     </ion-footer>
+
+    <ion-action-sheet
+      :is-open="isShowingActions"
+      :header="period.localized"
+      css-class="actions"
+      :buttons="actions"
+      translucent
+      @on-did-dismiss="isShowingActions = false"
+    />
   </ion-page>
 </template>
 
@@ -54,6 +63,7 @@ import {
   periodKey,
   setNextPeriod,
   setPrevPeriod,
+  updatePeriodConfig,
 } from '../modules/time/time.store'
 
 export default defineComponent({
@@ -68,6 +78,7 @@ export default defineComponent({
   setup() {
     const state = {
       slider: ref<any>(null),
+      isShowingActions: ref<boolean>(false),
     }
 
     const getters = {
@@ -84,6 +95,29 @@ export default defineComponent({
         speed: 400,
         allowTouchMove: !getters.isEditing.value,
       })),
+
+      actions: computed(() => [
+        {
+          text: getters.period.value.isDisabled ? 'Enable' : 'Disable',
+          icon: getters.period.value.isDisabled ? 'flash-outline' : 'flash-off-outline',
+          role: 'destructive',
+          handler: () => {
+            state.isShowingActions.value = false
+
+            nextTick(() =>
+              updatePeriodConfig(getters.period.value.key, { isDisabled: !getters.period.value.isDisabled }),
+            )
+          },
+        },
+        {
+          text: 'Cancel',
+          icon: 'close-outline',
+          role: 'cancel',
+          handler: () => {
+            state.isShowingActions.value = false
+          },
+        },
+      ]),
     }
 
     const methods = {
@@ -141,6 +175,12 @@ export default defineComponent({
       top: -5px;
       padding: 0.5em 0.5em 0.25em 0.5em;
       font-size: 10px;
+    }
+  }
+
+  &.period-disabled {
+    .header-title {
+      text-decoration: line-through;
     }
   }
 }

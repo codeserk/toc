@@ -1,6 +1,6 @@
 <template>
   <ion-content class="create-section">
-    <h1>New section</h1>
+    <h1 class="ion-text-center">New section</h1>
 
     <ion-item>
       <ion-input v-model="name" placeholder="Section name" />
@@ -43,3 +43,11 @@ export default defineComponent({
   },
 })
 </script>
+
+<style lang="scss" scoped>
+.create-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+</style>

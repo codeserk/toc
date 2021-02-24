@@ -190,9 +190,13 @@ import {
   closeOutline,
   checkmarkCircle,
   cog,
+  flashOutline,
+  flashOffOutline,
 } from 'ionicons/icons'
 
 addIcons({
+  'flash-outline': flashOutline,
+  'flash-off-outline': flashOffOutline,
   'checkmark-circle': checkmarkCircle,
   cog: cog,
   'close-outline': closeOutline,
