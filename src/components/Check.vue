@@ -6,9 +6,7 @@
     @click="!isEditing && onToggleChanged(check.id, !check.isCompleted)"
   >
     <ion-ripple-effect v-if="!isEditing" />
-    <ion-reorder slot="start" v-if="isEditing">
-      <ion-icon name="reorder-three-outline"></ion-icon>
-    </ion-reorder>
+    <ion-reorder slot="start" v-if="isEditing" />
 
     <ion-label v-text="check.name" v-if="!isEditing" />
     <ion-input :value="check.name" @input="$emit('name-changed', $event.target.value)" v-if="isEditing" />

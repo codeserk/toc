@@ -77,6 +77,10 @@ const mutations = {
   setSection(section: SavedSection) {
     state.sections[section.id] = section
   },
+
+  removeSection(id: string) {
+    delete state.sections[id]
+  },
 }
 
 // Actions
@@ -155,6 +159,16 @@ export async function assignSticker(sectionId: string) {
   const sticker = getRandomSticker()
   section.stickers[periodKey.value] = sticker
 
+  await persist()
+}
+
+export async function removeSection(id: string) {
+  const section = getSectionById(id)
+  if (!section) {
+    return
+  }
+
+  mutations.removeSection(section.id)
   await persist()
 }
 

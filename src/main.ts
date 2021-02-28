@@ -94,9 +94,11 @@ import {
   IonSelectOption,
   IonBadge,
   IonFooter,
+  IonAlert,
 } from '@ionic/vue'
 app
   .component('IonApp', IonApp)
+  .component('IonAlert', IonAlert)
   .component('IonActionSheet', IonActionSheet)
   .component('IonAvatar', IonAvatar)
   .component('IonBackButton', IonBackButton)

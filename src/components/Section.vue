@@ -17,7 +17,7 @@
     <ion-content>
       <sticker v-if="isCompleted" :animated="isShowingAnimation" :sticker="stickerAssigned" />
 
-      <ion-reorder-group @ion-item-reorder="({ detail }) => onReordered(detail)">
+      <ion-reorder-group :disabled="false" @ion-item-reorder="({ detail }) => onReordered(detail)">
         <check
           v-for="check in sortedChecksForPeriod"
           :key="check.id"
