@@ -103,9 +103,6 @@ export default defineComponent({
           text: 'Cancel',
           role: 'cancel',
           cssClass: 'secondary',
-          handler: () => {
-            console.log('Confirm Cancel')
-          },
         },
         {
           text: 'Borrar',

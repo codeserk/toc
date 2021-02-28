@@ -2,7 +2,6 @@
   <div
     class="section"
     :class="{
-      'period-disabled': period.isDisabled,
       'section-editing': isEditing,
       'section-completed': isCompleted,
       'section-animating': isShowingAnimation,

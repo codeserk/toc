@@ -6,7 +6,9 @@ import { Period, PeriodConfig } from './time.interface'
 
 const state = {
   availablePeriods: ref<Record<string, Period>>({}),
-  periodKey: ref<string>(getCurrentPeriod()),
+  periodKey: ref<string>(moment().format('YYYY-MM-DD')),
+
+  pausedAt: ref<string | undefined>(undefined),
 }
 
 // Getters
@@ -17,8 +19,26 @@ export const isCurrentPeriod = computed(() => periodKey.value === getCurrentPeri
 
 export const availablePeriods = computed((): Period[] => Object.values(state.availablePeriods.value))
 
-export function getCurrentPeriod(): string {
+export const isPaused = computed(() => !!state.pausedAt.value)
+export const pausedKey = computed(() => state.pausedAt.value)
+export const pausedPeriod = computed(() =>
+  pausedKey.value ? state.availablePeriods.value[pausedKey.value] : undefined,
+)
+
+export function getNowPeriod(): string {
   return moment().format('YYYY-MM-DD')
+}
+
+export function getLastDate(): moment.Moment {
+  if (pausedKey.value) {
+    return moment(pausedKey.value, 'YYYY-MM-DD')
+  }
+
+  return moment()
+}
+
+export function getCurrentPeriod(): string {
+  return getLastDate().format('YYYY-MM-DD')
 }
 
 export function getPeriodIndex(periodKey: string): number {
@@ -46,11 +66,18 @@ const mutations = {
   setPeriod(key: string) {
     state.periodKey.value = key
   },
+
+  setPausedAt(key?: string) {
+    state.pausedAt.value = key
+  },
 }
 
 function calculateAvailablePeriods() {
-  let date = moment().subtract(settings.value.storeDays, 'days')
-  const now = moment()
+  let date = getLastDate()
+    .clone()
+    .subtract(settings.value.storeDays, 'days')
+  const now = getLastDate().clone()
+
   while (date.isSameOrBefore(now)) {
     const key = date.format('YYYY-MM-DD')
     if (!state.availablePeriods.value[key]) {
@@ -77,8 +104,23 @@ async function loadPeriodConfigFromStorage(key: string): Promise<PeriodConfig | 
   }
 }
 
+async function loadPausedAtPeriod(): Promise<string | undefined> {
+  try {
+    const data = await Storage.get({ key: `paused-at-period` })
+    if (data?.value) {
+      return data?.value || undefined
+    }
+  } catch (error) {
+    console.error(error)
+  }
+}
+
 // Actions
 export async function loadPeriods() {
+  const pausedAtPeriod = await loadPausedAtPeriod()
+  mutations.setPausedAt(pausedAtPeriod)
+  setLastPeriod()
+
   calculateAvailablePeriods()
   for (const period of availablePeriods.value) {
     const config = await loadPeriodConfigFromStorage(period.key)
@@ -105,6 +147,10 @@ export function setNextPeriod() {
   }
 }
 
+export function setLastPeriod() {
+  mutations.setPeriod(getLastDate().format('YYYY-MM-DD'))
+}
+
 export async function updatePeriodConfig(key: string, config: PeriodConfig) {
   const period = state.availablePeriods.value[key]
   if (!period) {
@@ -115,8 +161,32 @@ export async function updatePeriodConfig(key: string, config: PeriodConfig) {
   await persistPeriodConfig(key, config)
 }
 
+export async function pausePeriod() {
+  const pausedAt = getNowPeriod()
+  mutations.setPausedAt(pausedAt)
+
+  calculateAvailablePeriods()
+  setLastPeriod()
+
+  await persistPausedAt()
+}
+
+export async function restorePeriod() {
+  const pausedAt = undefined
+  mutations.setPausedAt(pausedAt)
+
+  calculateAvailablePeriods()
+  setLastPeriod()
+
+  await persistPausedAt()
+}
+
 async function persistPeriodConfig(key: string, config: PeriodConfig) {
   const data = JSON.stringify(config)
 
   await Storage.set({ key: `period-${key}`, value: data })
+}
+
+async function persistPausedAt() {
+  await Storage.set({ key: 'paused-at-period', value: pausedKey.value ?? '' })
 }

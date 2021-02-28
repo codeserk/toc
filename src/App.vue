@@ -19,7 +19,7 @@ export default defineComponent({
     onMounted(async () => {
       await loadSections()
       await loadStates()
-      loadPeriods()
+      await loadPeriods()
 
       state.isReady.value = true
     })

@@ -12,7 +12,7 @@
       </swiper>
     </ion-content>
 
-    <ion-footer class="sections-header" :class="{ 'period-disabled': period.isDisabled }">
+    <ion-footer class="sections-header">
       <ion-toolbar>
         <ion-buttons slot="start">
           <ion-button @click="setPrevPeriod" :disabled="!hasPrevPeriod">
@@ -26,6 +26,7 @@
         <ion-title class="header-title" @click="isShowingActions = true">
           <span v-text="period.localized" />
           <ion-badge v-text="isCurrentPeriod ? 'Hoy' : ''" />
+          <ion-badge v-text="isPaused ? 'Pause' : ''" color="warning" />
         </ion-title>
 
         <ion-buttons slot="end">
@@ -59,11 +60,13 @@ import {
   hasNextPeriod,
   hasPrevPeriod,
   isCurrentPeriod,
+  isPaused,
+  pausePeriod,
   period,
   periodKey,
+  restorePeriod,
   setNextPeriod,
   setPrevPeriod,
-  updatePeriodConfig,
 } from '../modules/time/time.store'
 
 export default defineComponent({
@@ -87,6 +90,7 @@ export default defineComponent({
       availablePeriods,
       period,
       isCurrentPeriod,
+      isPaused,
 
       hasPrevPeriod: computed(() => hasPrevPeriod(periodKey.value)),
       hasNextPeriod: computed(() => hasNextPeriod(periodKey.value)),
@@ -98,15 +102,19 @@ export default defineComponent({
 
       actions: computed(() => [
         {
-          text: getters.period.value.isDisabled ? 'Enable' : 'Disable',
-          icon: getters.period.value.isDisabled ? 'flash-outline' : 'flash-off-outline',
+          text: getters.isPaused.value ? 'Restaurar' : 'Pausar',
+          icon: getters.isPaused.value ? 'play-circle-outline' : 'pause-circle-outline',
           role: 'destructive',
           handler: () => {
             state.isShowingActions.value = false
 
-            nextTick(() =>
-              updatePeriodConfig(getters.period.value.key, { isDisabled: !getters.period.value.isDisabled }),
-            )
+            nextTick(async () => {
+              if (getters.isPaused.value) {
+                await restorePeriod()
+              } else {
+                await pausePeriod()
+              }
+            })
           },
         },
         {

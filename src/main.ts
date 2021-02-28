@@ -195,6 +195,7 @@ import {
   cog,
   flashOutline,
   flashOffOutline,
+  pauseCircleOutline,
 } from 'ionicons/icons'
 
 addIcons({
@@ -203,6 +204,7 @@ addIcons({
   'flash-off-outline': flashOffOutline,
   'checkmark-circle': checkmarkCircle,
   cog: cog,
+  'pause-circle-outline': pauseCircleOutline,
   'close-outline': closeOutline,
   'add-outline': addOutline,
   'reorder-three-outline': reorderThreeOutline,
