@@ -53,7 +53,6 @@ export default defineComponent({
   setup(props: any) {
     const methods = {
       async onToggleChanged(checkId: string, isCompleted: boolean) {
-        console.log(isCompleted)
         if (props.isEditing) {
           return
         }

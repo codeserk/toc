@@ -1,6 +1,6 @@
 <template>
   <ion-page>
-    <ion-content fullscreen>
+    <ion-content>
       <swiper id="slider" :space-between="0" :speed="400" class="slider">
         <swiper-slide v-for="section in sectionsSorted" :key="section.id">
           <checks-section :section-id="section.id" />
@@ -149,6 +149,9 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+ion-content {
+  overflow-x: hidden;
+}
 .slider {
   height: 100%;
 

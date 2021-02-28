@@ -1,5 +1,13 @@
 <template>
-  <div class="section" :class="{ 'period-disabled': period.isDisabled, 'section-editing': isEditing }">
+  <div
+    class="section"
+    :class="{
+      'period-disabled': period.isDisabled,
+      'section-editing': isEditing,
+      'section-completed': isCompleted,
+      'section-animating': isShowingAnimation,
+    }"
+  >
     <sections-view-header
       :section-id="sectionId"
       @name-changed="name => (section.name = name)"
@@ -7,7 +15,9 @@
       @save="save"
     />
     <ion-content>
-      <ion-reorder-group :disabled="false" @ion-item-reorder="({ detail }) => onReordered(detail)">
+      <sticker v-if="isCompleted" :animated="isShowingAnimation" :sticker="stickerAssigned" />
+
+      <ion-reorder-group @ion-item-reorder="({ detail }) => onReordered(detail)">
         <check
           v-for="check in sortedChecksForPeriod"
           :key="check.id"
@@ -29,18 +39,23 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref } from 'vue'
+import { computed, defineComponent, reactive, ref, watch } from 'vue'
 import { SavedSection } from '../modules/sections/section.interface'
 import {
   addCheck,
+  assignSticker,
   getSectionById,
   getSectionSortedChecks,
+  getStickerAssigned,
   isEditing,
+  isSectionCompleted,
   stopEditing,
   updateSection,
 } from '../modules/sections/section.store'
 
 import SectionsViewHeader from '@/components/SectionsView/SectionsViewHeader.vue'
+import Sticker from '@/components/SectionsView/Sticker.vue'
+
 import { deepCopy } from '../utils/object'
 import { isCheckCompleted } from '../modules/checks/check.store'
 import { period, periodKey } from '../modules/time/time.store'
@@ -48,6 +63,7 @@ import Check from './Check.vue'
 
 export default defineComponent({
   components: {
+    Sticker,
     SectionsViewHeader,
     Check,
   },
@@ -66,6 +82,8 @@ export default defineComponent({
       originalSection: reactive<SavedSection>(initialSection!),
       section: ref<SavedSection>(initialSection!),
       newCheckName: ref<string>(''),
+
+      isShowingAnimation: ref<boolean>(false),
     }
 
     const getters = {
@@ -73,6 +91,8 @@ export default defineComponent({
       period,
       isEditing,
       isCheckNameValid: computed(() => !!state.newCheckName.value),
+      isCompleted: computed(() => isSectionCompleted(props.sectionId)),
+      stickerAssigned: computed(() => getStickerAssigned(props.sectionId)),
 
       sortedChecks: computed(() => getSectionSortedChecks(state.section.value)),
 
@@ -134,11 +154,20 @@ export default defineComponent({
       },
 
       async save() {
-        console.log(state.section.value)
         await updateSection(state.section.value)
         stopEditing()
       },
     }
+
+    watch(getters.isCompleted, async (isCompleted: boolean) => {
+      if (isCompleted && !getters.stickerAssigned.value) {
+        await assignSticker(props.sectionId)
+        state.isShowingAnimation.value = true
+
+        await new Promise(resolve => setTimeout(resolve, 3000))
+        state.isShowingAnimation.value = false
+      }
+    })
 
     return { ...state, ...getters, ...methods }
   },
@@ -149,13 +178,23 @@ export default defineComponent({
 .section {
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
   width: 100%;
   height: 100%;
 
   ion-content {
+    --background: #fff;
+
     flex: 1;
+    overflow-x: hidden !important;
     overflow-y: auto;
     transition: opacity 0.4s ease-in-out;
+
+    ion-item {
+      --background: #fffa;
+
+      transition: opacity 0.4s ease-in-out;
+    }
   }
   ion-header {
     flex: 0;
@@ -178,6 +217,12 @@ export default defineComponent({
       ion-content {
         opacity: 1;
       }
+    }
+  }
+
+  &.section-animating {
+    ion-item {
+      opacity: 0;
     }
   }
 }

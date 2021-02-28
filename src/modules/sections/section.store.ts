@@ -1,6 +1,9 @@
 import { Storage } from '@capacitor/core'
 import { computed, reactive, ref } from 'vue'
 import { SavedCheck } from '../checks/check.interface'
+import { isCheckCompleted } from '../checks/check.store'
+import { getRandomSticker } from '../stickers/sticker.store'
+import { periodKey } from '../time/time.store'
 import { SavedSection, Section } from './section.interface'
 
 const state = {
@@ -31,6 +34,25 @@ export function getSectionById(id: string): SavedSection | undefined {
 
 export function getSectionSortedChecks(section: Section): SavedCheck[] {
   return Object.values(section.checks).sort((checkA, checkB) => checkA.position - checkB.position)
+}
+
+export function isSectionCompleted(id: string): boolean {
+  const section = getSectionById(id)
+  if (!section) {
+    return false
+  }
+
+  const checks = Object.keys(section.checks)
+  return checks.length > 0 && checks.every(checkId => isCheckCompleted(checkId))
+}
+
+export function getStickerAssigned(id: string): string | undefined {
+  const section = getSectionById(id)
+  if (!section) {
+    return
+  }
+
+  return section.stickers[periodKey.value]
 }
 
 export function getNextCheckPosition(id: string): number {
@@ -87,6 +109,7 @@ export async function addSection(name: string): Promise<SavedSection> {
     name,
     position: nextSectionPosition.value,
     checks: {},
+    stickers: {},
   }
 
   mutations.setSection(savedSection)
@@ -116,6 +139,21 @@ export async function addCheck(sectionId: string, name: string) {
 
 export async function updateSection(section: SavedSection) {
   mutations.setSection(section)
+
+  await persist()
+}
+
+export async function assignSticker(sectionId: string) {
+  const section = getSectionById(sectionId)
+  if (!section) {
+    return
+  }
+  if (section.stickers[periodKey.value]) {
+    return
+  }
+
+  const sticker = getRandomSticker()
+  section.stickers[periodKey.value] = sticker
 
   await persist()
 }
