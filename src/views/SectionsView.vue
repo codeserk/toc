@@ -26,7 +26,7 @@
         <ion-title class="header-title" @click="isShowingActions = true">
           <span v-text="period.localized" />
           <ion-badge v-text="isCurrentPeriod ? $t('today') : ''" />
-          <ion-badge v-text="isPaused ? $t('pause') : ''" color="warning" />
+          <ion-badge v-text="isPaused ? $t('paused') : ''" color="warning" />
         </ion-title>
 
         <ion-buttons slot="end">

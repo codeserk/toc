@@ -14,26 +14,50 @@
       @save="save"
     />
     <ion-content>
-      <sticker v-if="isCompleted" :animated="isShowingAnimation" :sticker="stickerAssigned" />
+      <transition name="fade-out">
+        <sticker v-if="isCompleted" :animated="isShowingAnimation" :sticker="stickerAssigned" />
+      </transition>
 
       <ion-reorder-group :disabled="false" @ion-item-reorder="({ detail }) => onReordered(detail)">
-        <check
-          v-for="check in sortedChecksForPeriod"
-          :key="check.id"
-          :is-editing="isEditing"
-          :check="check"
-          @name-changed="newName => updateCheckName(check.id, newName)"
-          @remove="removeCheck(check.id)"
-        />
+        <transition-group
+          :duration="400"
+          name="test"
+          enter-active-class="animate__animated animate__fadeInUp"
+          leave-active-class="animate__animated animate__fadeOutDown"
+        >
+          <check
+            v-for="check in sortedChecksForPeriod"
+            :key="check.id"
+            :is-editing="isEditing"
+            :check="check"
+            @name-changed="newName => updateCheckName(check.id, newName)"
+            @remove="removeCheck(check.id)"
+          />
+        </transition-group>
       </ion-reorder-group>
+
+      <transition name="slide-fade" appear>
+        <div class="empty-state" v-if="!isEditing && isEmpty">
+          <ion-icon name="calendar-outline" size="large" />
+          <h1 v-t="'section.empty.title'" />
+          <h2 v-t="'section.empty.subtitle'" />
+        </div>
+      </transition>
     </ion-content>
 
-    <ion-item v-if="!isEditing">
-      <ion-input v-model="newCheckName" :placeholder="$t('section.newCheck')" @keyup.enter="addCheck" />
-      <ion-button :disabled="!isCheckNameValid" @click="addCheck" shape="round" fill="block">
-        <ion-icon name="add-outline" slot="icon-only" />
-      </ion-button>
-    </ion-item>
+    <transition
+      :duration="5000"
+      name="test"
+      enter-active-class="animate__animated animate__fadeIn"
+      leave-active-class="animate__animated animate__fadeOut"
+    >
+      <ion-item v-if="!isEditing">
+        <ion-input v-model="newCheckName" :placeholder="$t('section.newCheck')" @keyup.enter="addCheck" />
+        <ion-button :disabled="!isCheckNameValid" @click="addCheck" shape="round" fill="block" autocapitalize="on">
+          <ion-icon name="add-outline" slot="icon-only" />
+        </ion-button>
+      </ion-item>
+    </transition>
   </div>
 </template>
 
@@ -101,6 +125,8 @@ export default defineComponent({
           isCompleted: isCheckCompleted(check.id),
         })),
       ),
+
+      isEmpty: computed(() => getters.sortedChecks.value.length === 0),
     }
 
     const methods = {
@@ -163,7 +189,7 @@ export default defineComponent({
         await assignSticker(props.sectionId)
         state.isShowingAnimation.value = true
 
-        await new Promise(resolve => setTimeout(resolve, 3000))
+        await new Promise(resolve => setTimeout(resolve, 1000))
         state.isShowingAnimation.value = false
       }
     })
@@ -174,6 +200,8 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+@import '../theme/transitions.scss';
+
 .section {
   display: flex;
   flex-direction: column;
@@ -193,6 +221,32 @@ export default defineComponent({
       --background: #fffa;
 
       transition: opacity 0.4s ease-in-out;
+    }
+
+    .empty-state {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      padding: 1em 2em;
+      text-align: center;
+
+      ion-icon {
+        width: 30vw;
+        height: 30vw;
+      }
+
+      h2 {
+        padding: 0 1em;
+        color: #999;
+        font-size: 1.25em;
+      }
     }
   }
   ion-header {

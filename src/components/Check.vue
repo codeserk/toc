@@ -6,21 +6,37 @@
     @click="!isEditing && onToggleChanged(check.id, !check.isCompleted)"
   >
     <ion-ripple-effect v-if="!isEditing" />
-    <ion-reorder slot="start" v-if="isEditing" />
+
+    <transition name="reorder">
+      <ion-reorder slot="start" v-if="isEditing" />
+    </transition>
 
     <ion-label v-text="check.name" v-if="!isEditing" />
     <ion-input :value="check.name" @input="$emit('name-changed', $event.target.value)" v-if="isEditing" />
 
-    <check-toggle
-      slot="end"
-      v-if="!isEditing"
-      :is-checked="check.isCompleted"
-      @change="isChecked => onToggleChanged(check.id, isChecked)"
-    />
+    <transition name="slide-fade">
+      <check-toggle
+        slot="end"
+        v-if="!isEditing"
+        key="check-toggle"
+        :is-checked="check.isCompleted"
+        @change="isChecked => onToggleChanged(check.id, isChecked)"
+      />
+    </transition>
 
-    <ion-button slot="end" v-if="isEditing" fill="clear" @click="$emit('remove')">
-      <ion-icon slot="icon-only" name="trash-outline" size="small" color="danger" />
-    </ion-button>
+    <transition name="slide-fade">
+      <ion-button
+        slot="end"
+        v-if="isEditing"
+        key="remove-button"
+        class="remove-button"
+        shape="round"
+        fill="block"
+        @click="$emit('remove')"
+      >
+        <ion-icon slot="icon-only" name="trash-outline" color="danger" />
+      </ion-button>
+    </transition>
   </ion-item>
 </template>
 
@@ -78,6 +94,7 @@ ion-item {
   }
 
   ion-reorder {
+    width: 43px;
     margin-right: 12px;
     padding-left: 12px;
   }
@@ -98,5 +115,45 @@ ion-item {
       padding-left: 0;
     }
   }
+}
+
+.reorder-enter-active,
+.reorder-leave-active {
+  transition: all 0.4s ease-in-out;
+}
+
+.reorder-enter-from,
+.reorder-leave-to {
+  width: 0;
+  margin: 0;
+  padding-left: 0;
+  opacity: 0;
+}
+
+.fade-enter-active {
+  transition: all 0.3s ease-out;
+}
+
+.fade-leave-active {
+  transition: all 0.5s cubic-bezier(1, 0.5, 0.8, 1);
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.slide-fade-enter-active {
+  transition: all 0.3s ease-out;
+}
+
+.slide-fade-leave-active {
+  display: none;
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  opacity: 0;
+  transform: translateX(20px);
 }
 </style>

@@ -5,6 +5,8 @@ import { locale } from './locale'
 
 import { IonicVue } from '@ionic/vue'
 
+import 'animate.css'
+
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/vue/css/core.css'
 
@@ -159,85 +161,4 @@ router.isReady().then(() => {
   app.mount('#app')
 })
 
-// Icons
-import { addIcons } from 'ionicons'
-import {
-  checkmarkOutline,
-  saveOutline,
-  createOutline,
-  playCircleOutline,
-  lockOpenOutline,
-  lockClosedOutline,
-  addCircleOutline,
-  optionsOutline,
-  ellipsisHorizontal,
-  ellipsisVertical,
-  happyOutline,
-  alertCircleOutline,
-  pencilOutline,
-  helpOutline,
-  chevronBackOutline,
-  chevronForwardOutline,
-  trashOutline,
-  eyeOutline,
-  eyeOffOutline,
-  cloudOfflineOutline,
-  cloudOutline,
-  clipboardOutline,
-  globeOutline,
-  shareOutline,
-  informationSharp,
-  statsChartSharp,
-  calendarOutline,
-  refreshOutline,
-  reorderThreeOutline,
-  addOutline,
-  closeOutline,
-  checkmarkCircle,
-  cog,
-  flashOutline,
-  flashOffOutline,
-  pauseCircleOutline,
-} from 'ionicons/icons'
-
-addIcons({
-  'checkmark-outline': checkmarkOutline,
-  'flash-outline': flashOutline,
-  'flash-off-outline': flashOffOutline,
-  'checkmark-circle': checkmarkCircle,
-  cog: cog,
-  'pause-circle-outline': pauseCircleOutline,
-  'close-outline': closeOutline,
-  'add-outline': addOutline,
-  'reorder-three-outline': reorderThreeOutline,
-  'refresh-outline': refreshOutline,
-  'trash-outline': trashOutline,
-  'save-outline': saveOutline,
-  'create-outline': createOutline,
-  'play-circle-outline': playCircleOutline,
-  'lock-open-outline': lockOpenOutline,
-  'lock-closed-outline': lockClosedOutline,
-  'add-circle-outline': addCircleOutline,
-  'options-outline': optionsOutline,
-  'ellipsis-horizontal': ellipsisHorizontal,
-  'ellipsis-vertical': ellipsisVertical,
-  'happy-outline': happyOutline,
-  'alert-circle-outline': alertCircleOutline,
-  'pencil-outline': pencilOutline,
-  'help-outline': helpOutline,
-  'eye-outline': eyeOutline,
-  'eye-off-outline': eyeOffOutline,
-  'clipboard-outline': clipboardOutline,
-  'information-sharp': informationSharp,
-  'globe-outline': globeOutline,
-  'share-outline': shareOutline,
-  'stats-sharp': statsChartSharp,
-  'calendar-outline': calendarOutline,
-
-  'cloud-outline': cloudOutline,
-  'cloud-offline-outline': cloudOfflineOutline,
-
-  // Arrows
-  'chevron-back-outline': chevronBackOutline,
-  'chevron-forward-outline': chevronForwardOutline,
-})
+import './icons'
