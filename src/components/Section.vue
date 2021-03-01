@@ -7,7 +7,7 @@
       'section-animating': isShowingAnimation,
     }"
   >
-    <sections-view-header
+    <section-header
       :section-id="sectionId"
       @name-changed="name => (section.name = name)"
       @cancel-edit="cancelEdit"
@@ -29,7 +29,7 @@
     </ion-content>
 
     <ion-item v-if="!isEditing">
-      <ion-input v-model="newCheckName" placeholder="Nuevo recordatorio..." @keyup.enter="addCheck" />
+      <ion-input v-model="newCheckName" :placeholder="$t('section.newCheck')" @keyup.enter="addCheck" />
       <ion-button :disabled="!isCheckNameValid" @click="addCheck" shape="round" fill="block">
         <ion-icon name="add-outline" slot="icon-only" />
       </ion-button>
@@ -52,7 +52,7 @@ import {
   updateSection,
 } from '../modules/sections/section.store'
 
-import SectionsViewHeader from '@/components/SectionsView/SectionsViewHeader.vue'
+import SectionHeader from '@/components/SectionsView/SectionHeader.vue'
 import Sticker from '@/components/SectionsView/Sticker.vue'
 
 import { deepCopy } from '../utils/object'
@@ -63,7 +63,7 @@ import Check from './Check.vue'
 export default defineComponent({
   components: {
     Sticker,
-    SectionsViewHeader,
+    SectionHeader,
     Check,
   },
 

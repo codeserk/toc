@@ -1,4 +1,4 @@
-<template>
+2<template>
   <ion-header translucent>
     <ion-toolbar v-show="!isEditing">
       <ion-title v-text="section.name" />
@@ -37,9 +37,8 @@
 
     <ion-alert
       :is-open="isShowingDeleteAlert"
-      header="Borrar seccion"
-      :sub-header="section.name"
-      message="Seguro?."
+      :header="$t('section.removeAlert.title')"
+      :message="$t('section.removeAlert.message', { name: section.name })"
       :buttons="alertButtons"
     />
   </ion-header>
@@ -48,6 +47,7 @@
 <script lang="ts">
 import { computed, defineComponent, ref } from 'vue'
 import { getSectionById, isEditing, removeSection, startEditing, stopEditing } from '@/modules/sections/section.store'
+import { useI18n } from 'vue-i18n'
 
 export default defineComponent({
   emits: ['name-changed', 'cancel-edit', 'save'],
@@ -59,6 +59,8 @@ export default defineComponent({
   },
 
   setup(props: any) {
+    const { t } = useI18n()
+
     const state = {
       isShowingActions: ref<boolean>(false),
       isShowingDeleteAlert: ref<boolean>(false),
@@ -77,7 +79,7 @@ export default defineComponent({
     const constants = {
       buttons: [
         {
-          text: 'Edit',
+          text: t('edit'),
           role: 'destructive',
           icon: 'pencil-outline',
           handler: () => {
@@ -85,14 +87,14 @@ export default defineComponent({
           },
         },
         {
-          text: 'Delete',
+          text: t('remove'),
           icon: 'trash-outline',
           handler: () => {
             state.isShowingDeleteAlert.value = true
           },
         },
         {
-          text: 'Cancel',
+          text: t('cancel'),
           icon: 'close-outline',
           role: 'cancel',
         },
@@ -100,12 +102,12 @@ export default defineComponent({
 
       alertButtons: [
         {
-          text: 'Cancel',
+          text: t('cancel'),
           role: 'cancel',
           cssClass: 'secondary',
         },
         {
-          text: 'Borrar',
+          text: t('remove'),
           role: 'destructive',
           cssClass: 'danger',
           handler: async () => {

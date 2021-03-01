@@ -1,12 +1,12 @@
 <template>
   <ion-content class="create-section">
-    <h1 class="ion-text-center">New section</h1>
+    <h1 class="ion-text-center" v-t="'section.new.title'" />
 
     <ion-item>
-      <ion-input v-model="name" placeholder="Section name" />
+      <ion-input v-model="name" :placeholder="$t('section.new.fields.name.label')" />
     </ion-item>
     <ion-item>
-      <ion-button :disabled="!isValid" @click="createSection">Create</ion-button>
+      <ion-button :disabled="!isValid" @click="createSection" v-t="'section.new.create'" />
     </ion-item>
   </ion-content>
 </template>

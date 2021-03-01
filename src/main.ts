@@ -1,6 +1,7 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
+import { locale } from './locale'
 
 import { IonicVue } from '@ionic/vue'
 
@@ -26,6 +27,7 @@ import './theme/variables.css'
 const app = createApp(App)
   .use(IonicVue)
   .use(router)
+  .use(locale)
 
 app.mixin({
   computed: {

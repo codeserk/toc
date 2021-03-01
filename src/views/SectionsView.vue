@@ -25,8 +25,8 @@
 
         <ion-title class="header-title" @click="isShowingActions = true">
           <span v-text="period.localized" />
-          <ion-badge v-text="isCurrentPeriod ? 'Hoy' : ''" />
-          <ion-badge v-text="isPaused ? 'Pause' : ''" color="warning" />
+          <ion-badge v-text="isCurrentPeriod ? $t('today') : ''" />
+          <ion-badge v-text="isPaused ? $t('pause') : ''" color="warning" />
         </ion-title>
 
         <ion-buttons slot="end">
@@ -55,6 +55,7 @@ import { isEditing, sectionsSorted } from '@/modules/sections/section.store'
 import 'swiper/swiper.scss'
 import { Swiper, SwiperSlide } from 'swiper/vue'
 import { computed, defineComponent, nextTick, onMounted, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import {
   availablePeriods,
   hasNextPeriod,
@@ -79,6 +80,7 @@ export default defineComponent({
   },
 
   setup() {
+    const { t } = useI18n()
     const state = {
       slider: ref<any>(null),
       isShowingActions: ref<boolean>(false),
@@ -102,7 +104,7 @@ export default defineComponent({
 
       actions: computed(() => [
         {
-          text: getters.isPaused.value ? 'Restaurar' : 'Pausar',
+          text: getters.isPaused.value ? t('restore') : t('pause'),
           icon: getters.isPaused.value ? 'play-circle-outline' : 'pause-circle-outline',
           role: 'destructive',
           handler: () => {
@@ -118,7 +120,7 @@ export default defineComponent({
           },
         },
         {
-          text: 'Cancel',
+          text: t('cancel'),
           icon: 'close-outline',
           role: 'cancel',
           handler: () => {
@@ -164,8 +166,6 @@ ion-content {
   height: 100%;
 
   ion-slide {
-    // align-items: flex-start;
-    // width: 100%;
     height: 100%;
   }
 }
